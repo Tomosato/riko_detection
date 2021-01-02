@@ -10,7 +10,7 @@ class FaceRecognition():
     顔の識別を実施するクラス
     """
 
-    def get_train_file_DataFrame(self, csv_path, target_path="../data/face/"):
+    def get_train_file_DataFrame(self, csv_path, target_path="../data/faces/"):
         """
         学習用の画像のパスを取得して、対応するファイルと人物のデータフレームを作成する
 
@@ -44,7 +44,7 @@ class FaceRecognition():
             encoded_face_list.append(encoed_image)
 
         target_image = face_recognition.load_image_file(target_image_path)
-        face_locations = face_recognition.face_locations(target_image)
+        face_locations = face_recognition.face_locations(target_image, model="cnn")
         face_encodings = face_recognition.face_encodings(target_image, face_locations)
 
         for face_encode in face_encodings:
