@@ -1,13 +1,15 @@
 # riko_detection
 中山莉子さんを自動検出して切り出す
 
+![motivation](motivation_tweet.png) 
+
 https://twitter.com/matudaieeeera/status/1342112905618018305
 
 を見て、やってみようとおもった。
 
 # セットアップ方法
 
-pipenvコマンドからのコマンドが依存関係の解消でエラーがはっせいするので
+pipenvコマンドからのコマンドが依存関係の解消でエラーが発生するので
 
 ```
 pipenv shell
