@@ -44,7 +44,7 @@ def riko_create_model():
     bench = create_model(
         "efficientdet_d1", # d0 ~ d7
         bench_task="predict",
-        num_classes=30, # 人かそれ以外
+        num_classes=20, # 人かそれ以外
     )
 
     return bench
@@ -76,11 +76,13 @@ if __name__ == "__main__":
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             for i in range(output.size(0)):
                 xmin, ymin, xmax, ymax, pred, label = output[i]
-                cv2.rectangle(img, pt1=(int(xmin), int(ymin)),
-                                pt2=(int(xmax.item()), int(ymax.item())),
-                                color=(255, 0, 0), thickness=4)
-                tl = round(0.002 * max(img.shape[0:2])) + 1
-                tf = max(tl - 1, 1)
-                cv2.putText(img, str(label.item()), (int(xmin.item()), int(ymin.item()) - 2), 0, tl / 3, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
+                #3,8, 11, 13,15,16
+                if label.item() == 21:
+                    cv2.rectangle(img, pt1=(int(xmin), int(ymin)),
+                                    pt2=(int(xmax.item()), int(ymax.item())),
+                                    color=(255, 0, 0), thickness=4)
+                    tl = round(0.002 * max(img.shape[0:2])) + 1
+                    tf = max(tl - 1, 1)
+                    cv2.putText(img, str(label.item()), (int(xmin.item()), int(ymin.item()) - 2), 0, tl / 3, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
     cv2.imwrite("test_result.jpg", img)
 
