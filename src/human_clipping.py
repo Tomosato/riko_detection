@@ -77,7 +77,7 @@ if __name__ == "__main__":
             for i in range(output.size(0)):
                 xmin, ymin, xmax, ymax, pred, label = output[i]
                 #3,8, 11, 13,15,16
-                if label.item() == 21:
+                if label.item() == 8:
                     cv2.rectangle(img, pt1=(int(xmin), int(ymin)),
                                     pt2=(int(xmax.item()), int(ymax.item())),
                                     color=(255, 0, 0), thickness=4)
