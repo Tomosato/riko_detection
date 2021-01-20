@@ -1,11 +1,9 @@
-from effdet import create_model, create_dataset, create_loader
+from effdet import create_model, create_loader
 from effdet.data import resolve_input_config
-from effdet.data.transforms import transforms_coco_eval
 import torch.utils.data as data
 import torch
 from PIL import Image
-from pathlib import Path
-import cv2
+
 
 class RikoDataset(data.Dataset):
     """
@@ -24,7 +22,7 @@ class RikoDataset(data.Dataset):
         target = dict(img_idx=index, img_size=(img.width, img.height))
         if self.transform is not None:
             img, target = self.transform(img, target)
-    
+
         return img, target
 
     @property
@@ -42,20 +40,30 @@ def riko_create_model():
     """
 
     bench = create_model(
-        "efficientdet_d1", # d0 ~ d7
+        "efficientdet_d1",  # d0 ~ d7
         bench_task="predict",
-        num_classes=20, # 人かそれ以外
+        num_classes=20  # 人かそれ以外
     )
 
     return bench
 
 
-if __name__ == "__main__":
+def get_bounding_box(image_paths):
+    """
+    受け取ったパスの画像から、人っぽいもののバウンディングボックスの
+    座標を返す
+
+    image_paths: 対象の画像のパスのリスト
+
+    return
+        切り出し候補の座標と画像のパス
+    """
+
     bench = riko_create_model()
     bench = bench.cuda()
     bench.eval()
-    image_path = "test_riko.png"
-    test_dataset = RikoDataset([Path(image_path)])
+
+    test_dataset = RikoDataset(image_paths)
     input_config = resolve_input_config({}, bench.config)
     loader = create_loader(
             test_dataset,
@@ -69,20 +77,28 @@ if __name__ == "__main__":
             num_workers=1,
             pin_mem=False)
 
+    result = {}
+
     with torch.no_grad():
         for input_image, target in loader:
+            target_image_path_index = target["img_idx"].item()
+            image_path = image_paths[target_image_path_index]
             output = bench(input_image, target)[0]
-            img = cv2.imread(image_path, cv2.IMREAD_COLOR)
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             for i in range(output.size(0)):
                 xmin, ymin, xmax, ymax, pred, label = output[i]
-                #3,8, 11, 13,15,16
+                #3,8, 11, 13,15,16がよさそう
                 if label.item() == 8:
-                    cv2.rectangle(img, pt1=(int(xmin), int(ymin)),
-                                    pt2=(int(xmax.item()), int(ymax.item())),
-                                    color=(255, 0, 0), thickness=4)
-                    tl = round(0.002 * max(img.shape[0:2])) + 1
-                    tf = max(tl - 1, 1)
-                    cv2.putText(img, str(label.item()), (int(xmin.item()), int(ymin.item()) - 2), 0, tl / 3, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
-    cv2.imwrite("test_result.jpg", img)
+                    if image_path in result:
+                        control_list = result[image_path]
+                        control_list.append([xmin.item(),
+                                            ymin.item(),
+                                            xmax.item(),
+                                            ymax.item()])
+                        result[image_path] = control_list
+                    else:
+                        result[image_path] = [[xmin.item(),
+                                                ymin.item(),
+                                                xmax.item(),
+                                                ymax.item()]]
 
+    return result
