@@ -31,7 +31,7 @@ class FaceRecognition():
 
         return train_list
 
-    def detection_riko(self, df, target_image_path):
+    def detection_riko(self, df, target_image):
         """
         画像の情報が入っているデータフレームをもらってきて、その情報
         をもとに学習する
@@ -43,7 +43,6 @@ class FaceRecognition():
 
             encoded_face_list.append(encoed_image)
 
-        target_image = face_recognition.load_image_file(target_image_path)
         face_locations = face_recognition.face_locations(target_image, model="cnn")
         face_encodings = face_recognition.face_encodings(target_image, face_locations)
 
@@ -53,9 +52,7 @@ class FaceRecognition():
 
             best_match_index = np.argmin(face_distances)
 
-            name = "unkonwn"
-
             if matches[best_match_index]:
-                name = df["name"][best_match_index]
-
-            print(name)
+                return True
+        
+        return False
