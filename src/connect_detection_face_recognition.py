@@ -12,12 +12,13 @@ def opencv2pillow(image):
     return np.array(new_image)
 
 
-def connect(image_paths, csv_path):
+def connect(image_paths, csv_path, leran_path):
     """
     物体検出の結果を顔認証のエンジンに渡す
 
     image_paths: 対象の画像のパスのリスト
     csv_path: 訓練データリストの入っているcsvファイルのパス
+    learn_path: 顔認証に必要な写真が入っているディレクトリのパス
     """
     target_image_imfos = get_bounding_box(image_paths)
 
@@ -37,7 +38,7 @@ def connect(image_paths, csv_path):
 
         # 顔認証
         face_recognition = FaceRecognition()
-        learn_df = face_recognition.get_train_file_DataFrame(csv_path, "data/faces/")
+        learn_df = face_recognition.get_train_file_DataFrame(csv_path, leran_path)
 
         for number, candidate_image in enumerate(candidate_images):
             compare_result = face_recognition.detection_riko(learn_df, candidate_image)
