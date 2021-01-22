@@ -32,6 +32,12 @@ MacかLinuxを使用していただければいいと思います。(Windowsの�
 * opencv-python (4.4.0.46)
 * face-recognition (1.3.0)
 
+物体検出にEfficientDetを使用したため
+
+https://github.com/rwightman/efficientdet-pytorch
+
+のmasterブランチをcloneしてくださいませ。
+
 # 簡単な動かし方
 
 ```python
